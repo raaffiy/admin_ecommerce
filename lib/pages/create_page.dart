@@ -1,9 +1,8 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:admin/components/my_button.dart';
 import 'package:admin/pages/success_page.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
 
 class CreatePage extends StatefulWidget {
   const CreatePage({Key? key});
@@ -25,6 +24,7 @@ class _CreatePageState extends State<CreatePage> {
   List<String> filterOptions = <String>['1', '2', '3', 'K.I'];
   String dropdownOptions = '';
 
+  // Options List Kelas, Jurusan, Options
   @override
   void initState() {
     super.initState();
@@ -37,8 +37,8 @@ class _CreatePageState extends State<CreatePage> {
   Uint8List? _image;
   File? selectedImage;
 
+  // Options Gallery Or Camera
   void showImagePickerOption(BuildContext context) {
-    // 3
     showModalBottomSheet(
       backgroundColor: Colors.grey.shade200,
       context: context,
@@ -110,6 +110,107 @@ class _CreatePageState extends State<CreatePage> {
       _image = File(returnImage.path).readAsBytesSync();
     });
     Navigator.of(context).pop();
+  }
+
+  // Button Add Product
+  final TextEditingController _nameProduct = TextEditingController();
+  final TextEditingController _descriptionProduct = TextEditingController();
+  final TextEditingController _priceProduct = TextEditingController();
+  final TextEditingController _nameAdmin = TextEditingController();
+
+  // Mengecek apakah inputan data sudah di isi atau belum
+  void _onTap() {
+    if (_image == null) {
+      _showNoImageSelectedDialog(); // Menampilkan dialog jika gambar belum dipilih
+    } else if (_nameProduct.text.isEmpty ||
+        _descriptionProduct.text.isEmpty ||
+        _priceProduct.text.isEmpty ||
+        _nameAdmin.text.isEmpty) {
+      _showDataNotEnteredDialog();
+    } else {
+      _showConfirmationDialog();
+    }
+  }
+
+// Method untuk menampilkan dialog jika gambar belum dipilih
+  Future<void> _showNoImageSelectedDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('No Image Selected'),
+          content:
+              const Text('Please select an image before adding the product.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Confirm (Are Yoru Sure?)
+  Future<void> _showConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Are You Sure?'),
+          content: const Text('Do not enter wrong data'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _completePurchase();
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showDataNotEnteredDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Incomplete Data'),
+          content: const Text('Some data has not been entered.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Navigator Jika _showConfirmationDialog ditekan "Yes"
+  void _completePurchase() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SuccessCart(),
+      ),
+    );
   }
 
   @override
@@ -225,6 +326,7 @@ class _CreatePageState extends State<CreatePage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: TextField(
+                    controller: _nameProduct,
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
@@ -267,6 +369,7 @@ class _CreatePageState extends State<CreatePage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: TextField(
+                    controller: _descriptionProduct,
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
@@ -309,6 +412,7 @@ class _CreatePageState extends State<CreatePage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: TextField(
+                    controller: _priceProduct,
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
@@ -323,6 +427,12 @@ class _CreatePageState extends State<CreatePage> {
                         color: Colors.grey[500],
                       ),
                     ),
+                    keyboardType: TextInputType
+                        .number, // Mengatur keyboard type menjadi number
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter
+                          .digitsOnly // Hanya menerima input berupa digit/angka
+                    ],
                   ),
                 ),
 
@@ -380,6 +490,7 @@ class _CreatePageState extends State<CreatePage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: TextField(
+                    controller: _nameAdmin,
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
@@ -529,16 +640,26 @@ class _CreatePageState extends State<CreatePage> {
                 const SizedBox(height: 25),
 
                 // Add Product button
-                MyButton(
-                  text: "Add Product",
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SuccessCart(),
+                GestureDetector(
+                  onTap: _onTap,
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    margin: const EdgeInsets.symmetric(horizontal: 25),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 104, 143, 106),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'Add Product',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 25),
