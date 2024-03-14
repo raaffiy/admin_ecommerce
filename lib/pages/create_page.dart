@@ -1,5 +1,5 @@
 import 'package:admin/components/my_button.dart';
-import 'package:admin/pages/home_page.dart';
+import 'package:admin/pages/success_page.dart';
 import 'package:flutter/material.dart';
 
 class CreatePage extends StatefulWidget {
@@ -421,7 +421,7 @@ class _CreatePageState extends State<CreatePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const HomePage(),
+                        builder: (context) => const SuccessCart(),
                       ),
                     );
                   },
