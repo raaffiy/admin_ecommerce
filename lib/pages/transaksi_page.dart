@@ -1,50 +1,27 @@
 import 'package:flutter/material.dart';
 
-class TransaksiPage extends StatelessWidget {
+class TransaksiPage extends StatefulWidget {
   const TransaksiPage({super.key});
 
   @override
+  State<TransaksiPage> createState() => _TransaksiPageState();
+}
+
+class _TransaksiPageState extends State<TransaksiPage> {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade300,
-      // Page
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Transaksi Page',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 50,
-              ),
-            ),
-
-            SizedBox(height: 5),
-
-            // Sub Title
-            Text(
-              'Maulana Ra\'afi',
-              style: TextStyle(
-                fontSize: 23,
-                color: Color.fromARGB(255, 87, 87, 87),
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            // Sub Title
-            Text(
-              'XI RPL U',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey,
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            SizedBox(height: 48),
-          ],
-        ),
+    return Container(
+      color: Colors.grey.shade300,
+      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Heading
+          Text(
+            'Transaction',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+          ),
+        ],
       ),
     );
   }

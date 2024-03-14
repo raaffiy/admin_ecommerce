@@ -1,6 +1,9 @@
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:admin/components/my_button.dart';
 import 'package:admin/pages/success_page.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CreatePage extends StatefulWidget {
   const CreatePage({Key? key});
@@ -18,6 +21,7 @@ class _CreatePageState extends State<CreatePage> {
   List<String> filterJurusan = <String>['TKJ', 'TEI', 'RPL', 'TET', 'AK', 'TO'];
   String dropdownJurusan = '';
 
+  // list Options
   List<String> filterOptions = <String>['1', '2', '3', 'K.I'];
   String dropdownOptions = '';
 
@@ -27,6 +31,85 @@ class _CreatePageState extends State<CreatePage> {
     dropdownKelas = filterKelas.first;
     dropdownJurusan = filterJurusan.first;
     dropdownOptions = filterOptions.first;
+  }
+
+  // Add Image Product
+  Uint8List? _image;
+  File? selectedImage;
+
+  void showImagePickerOption(BuildContext context) {
+    // 3
+    showModalBottomSheet(
+      backgroundColor: Colors.grey.shade200,
+      context: context,
+      builder: (builder) {
+        return Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height / 7.5,
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      _pickImageFromGallery();
+                    },
+                    child: const SizedBox(
+                      child: Column(
+                        children: [
+                          Icon(Icons.image, size: 70),
+                          Text("Gallery"),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      _pickImageFromCamera();
+                    },
+                    child: const SizedBox(
+                      child: Column(
+                        children: [
+                          Icon(Icons.camera_alt, size: 70),
+                          Text("Camera"),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Gallery
+  Future _pickImageFromGallery() async {
+    final returnImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (returnImage == null) return;
+    setState(() {
+      selectedImage = File(returnImage.path);
+      _image = File(returnImage.path).readAsBytesSync();
+    });
+    Navigator.of(context).pop();
+  }
+
+  // Camera
+  Future _pickImageFromCamera() async {
+    final returnImage =
+        await ImagePicker().pickImage(source: ImageSource.camera);
+    if (returnImage == null) return;
+    setState(() {
+      selectedImage = File(returnImage.path);
+      _image = File(returnImage.path).readAsBytesSync();
+    });
+    Navigator.of(context).pop();
   }
 
   @override
@@ -42,10 +125,10 @@ class _CreatePageState extends State<CreatePage> {
                 // Logo
                 const Icon(
                   Icons.add_task,
-                  size: 70,
+                  size: 65,
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
 
                 // Welcome Back
                 Text(
@@ -57,7 +140,7 @@ class _CreatePageState extends State<CreatePage> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -83,6 +166,37 @@ class _CreatePageState extends State<CreatePage> {
                         ),
                       ),
                     ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Add Image
+                IconButton(
+                  onPressed: () {
+                    showImagePickerOption(context);
+                  },
+                  icon: _image != null
+                      ? Container(
+                          width: 180,
+                          height: 180,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: MemoryImage(_image!),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        )
+                      : const Icon(
+                          Icons.add_photo_alternate_outlined,
+                          size: 75,
+                        ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Text(
+                    "- Image Persegi ( Recommendation ) -",
+                    style: TextStyle(color: Colors.grey[800], fontSize: 12),
                   ),
                 ),
 
@@ -241,7 +355,7 @@ class _CreatePageState extends State<CreatePage> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 15),
 
                 // Name
                 const Padding(

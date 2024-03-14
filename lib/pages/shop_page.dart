@@ -1,50 +1,27 @@
 import 'package:flutter/material.dart';
 
-class ShopPage extends StatelessWidget {
+class ShopPage extends StatefulWidget {
   const ShopPage({super.key});
 
   @override
+  State<ShopPage> createState() => _ShopPageState();
+}
+
+class _ShopPageState extends State<ShopPage> {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade300,
-      // Page
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Shop Page',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 50,
-              ),
-            ),
-
-            SizedBox(height: 5),
-
-            // Sub Title
-            Text(
-              'Maulana Ra\'afi',
-              style: TextStyle(
-                fontSize: 23,
-                color: Color.fromARGB(255, 87, 87, 87),
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            // Sub Title
-            Text(
-              'XI RPL U',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey,
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            SizedBox(height: 48),
-          ],
-        ),
+    return Container(
+      color: Colors.grey.shade300,
+      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Heading
+          Text(
+            'Your Products',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+          ),
+        ],
       ),
     );
   }
