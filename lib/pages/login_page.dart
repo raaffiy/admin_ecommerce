@@ -3,18 +3,69 @@ import 'package:admin/components/my_textfield.dart';
 import 'package:admin/components/my_textfield_email.dart';
 import 'package:admin/components/square_tile.dart';
 import 'package:admin/pages/forgot_page.dart';
-import 'package:admin/pages/home_page.dart';
-import 'package:admin/pages/register_page.dart';
+import 'package:admin/services/auth_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key});
+  final Function()? onTap;
+  const LoginPage({super.key, required this.onTap});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // Text Editing Controller
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  // Sign User in method
+  void signUserIn() async {
+    // show loading circle
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    // Try Sign In
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      // Pop The loading Circle
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      // Pop The loading Circle
+      Navigator.pop(context);
+      // show eror message
+      showErrorMessage(e.code);
+    }
+  }
+
+  // eror message user
+  void showErrorMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const AlertDialog(
+          backgroundColor: Colors.white,
+          title: Center(
+            child: Text(
+              "Enter your email and password correctly",
+              style: TextStyle(color: Colors.red, fontSize: 15),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +98,8 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 25),
 
                 // email textfield
-                const MyTextFieldEmail(
+                MyTextFieldEmail(
+                  controller: emailController,
                   hintText: 'Email',
                   obscureText: false,
                 ),
@@ -55,7 +107,8 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 12),
 
                 // password textfield
-                const MyTextField(
+                MyTextField(
+                  controller: passwordController,
                   hintText: 'Password',
                   obscureText: true,
                 ),
@@ -96,14 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                 // sign in button
                 MyButton(
                   text: "Sign In",
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomePage(),
-                      ),
-                    );
-                  },
+                  onTap: signUserIn,
                 ),
 
                 const SizedBox(height: 25),
@@ -144,9 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     // Google Button
                     SquareTile(
-                      onTap: () {
-                        // Handle Google sign-in logic here
-                      },
+                      onTap: () => AuthService().signInWithGoogle(),
                       imagePath: 'assets/google.png',
                     )
                   ],
@@ -164,14 +208,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(width: 4),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegisterPage(),
-                          ),
-                        );
-                      },
+                      onTap: widget.onTap,
                       child: const Text(
                         'Register now',
                         style: TextStyle(

@@ -3,16 +3,76 @@ import 'package:admin/components/my_textfield.dart';
 import 'package:admin/components/my_textfield_email.dart';
 import 'package:admin/components/square_tile.dart';
 import 'package:admin/pages/forgot_page.dart';
+import 'package:admin/services/auth_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key});
+  final Function()? onTap;
+  const RegisterPage({super.key, required this.onTap});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  // Text Editing Controller
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
+  // Sign User up method
+  void signUserUp() async {
+    // show loading circle
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    // Try create the user
+    try {
+      // Check if Password is confirm
+      if (passwordController.text == confirmPasswordController.text) {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+      } else {
+        // show error messag, password don't match
+        showErrorMessage("Password Don't Match!");
+      }
+      // Pop The loading Circle
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      // Pop The loading Circle
+      Navigator.pop(context);
+      // show eror message
+      showErrorMessage(e.code);
+    }
+  }
+
+  // eror message user
+  void showErrorMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const AlertDialog(
+          backgroundColor: Colors.white,
+          title: Center(
+            child: Text(
+              "Enter your email and password correctly",
+              style: TextStyle(color: Colors.red, fontSize: 15),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +113,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 25),
 
                 // email textfield
-                const MyTextFieldEmail(
+                MyTextFieldEmail(
+                  controller: emailController,
                   hintText: 'Email',
                   obscureText: false,
                 ),
@@ -61,7 +122,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 12),
 
                 // password textfield
-                const MyTextField(
+                MyTextField(
+                  controller: passwordController,
                   hintText: 'Password',
                   obscureText: true,
                 ),
@@ -69,7 +131,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 12),
 
                 // confirm password textfield
-                const MyTextField(
+                MyTextField(
+                  controller: confirmPasswordController,
                   hintText: 'Confirm Password',
                   obscureText: true,
                 ),
@@ -110,7 +173,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 // sign in button
                 MyButton(
                   text: "Sign Up",
-                  onTap: () {},
+                  onTap: signUserUp,
                 ),
 
                 const SizedBox(height: 25),
@@ -150,9 +213,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     // Google Button
                     SquareTile(
-                      onTap: () {
-                        // Handle Google sign-in logic here
-                      },
+                      onTap: () => AuthService().signInWithGoogle(),
                       imagePath: 'assets/google.png',
                     )
                   ],
@@ -165,14 +226,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Already have an account?',
+                      'Alredy have an account?',
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                     const SizedBox(width: 4),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
+                      onTap: widget.onTap,
                       child: const Text(
                         'Login now',
                         style: TextStyle(

@@ -1,14 +1,60 @@
+import 'package:admin/components/my_button.dart';
 import 'package:admin/components/my_textfield_email.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({Key? key});
+  const ForgotPasswordPage({super.key});
 
   @override
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final emailController = TextEditingController();
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> passwordReset() async {
+    try {
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: emailController.text.trim());
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return const AlertDialog(
+              backgroundColor: Colors.white,
+              content: Text(
+                'Password reset link sent! Check your email',
+                style: TextStyle(color: Colors.red),
+              ),
+            );
+          },
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      print(e);
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return const AlertDialog(
+              backgroundColor: Colors.white,
+              content: Text(
+                "Enter Email Correctly",
+                style: TextStyle(color: Colors.red),
+              ),
+            );
+          },
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +93,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           const SizedBox(height: 20),
 
           // email textfield
-          const MyTextFieldEmail(
+          MyTextFieldEmail(
+            controller: emailController,
             hintText: 'Email',
             obscureText: false,
           ),
@@ -55,27 +102,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           const SizedBox(height: 15),
 
           // Button
-          GestureDetector(
-            onTap: () {
-              // Handle the password reset logic here
-            },
-            child: Container(
-              padding: const EdgeInsets.all(25),
-              margin: const EdgeInsets.symmetric(horizontal: 25),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Center(
-                child: Text(
-                  "Reset Password",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: MyButton(
+              text: "Reset Password",
+              onTap: passwordReset,
             ),
           ),
         ],

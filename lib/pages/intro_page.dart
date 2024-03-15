@@ -1,8 +1,8 @@
+import 'package:admin/pages/auth_page.dart';
 import 'package:flutter/material.dart';
-import 'package:admin/pages/login_page.dart';
 
 class IntroPage extends StatelessWidget {
-  const IntroPage({Key? key});
+  const IntroPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +56,7 @@ class IntroPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const LoginPage(),
+                      builder: (context) => const AuthPage(),
                     ),
                   );
                 },

@@ -1,10 +1,14 @@
 import 'package:admin/pages/about_page.dart';
 import 'package:admin/pages/home_page.dart';
 import 'package:admin/pages/intro_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class DrawerList extends StatelessWidget {
-  const DrawerList({Key? key}) : super(key: key);
+  final Function signOutCallback; // Callback untuk sign out
+
+  const DrawerList({Key? key, required this.signOutCallback}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -91,12 +95,8 @@ class DrawerList extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const IntroPage(),
-                  ),
-                );
+                FirebaseAuth.instance.signOut();
+                Get.offAll(const IntroPage());
               },
             ),
           ),
