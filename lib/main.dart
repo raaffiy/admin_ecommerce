@@ -2,7 +2,7 @@ import 'package:admin/pages/intro_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:get/get.dart'; // Tambahkan import GetX di sini
+import 'package:get/get.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
