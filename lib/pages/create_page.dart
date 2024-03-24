@@ -553,7 +553,7 @@ class _CreatePageState extends State<CreatePage> {
                         child: Row(
                           children: [
                             Text(
-                              'Name : ',
+                              'Name (Toko) : ',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
